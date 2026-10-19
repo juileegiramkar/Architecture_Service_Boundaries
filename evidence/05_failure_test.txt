@@ -1,0 +1,66 @@
+# Order Service before the failure (note the pid)
+$ curl -s http://127.0.0.1:8000/health
+{
+  "service": "order-service",
+  "status": "up",
+  "pid": 26788,
+  "uptime_seconds": 4.8,
+  "orders_created": 1,
+  "orders_rejected": 3,
+  "inventory_failures": 0
+}
+
+
+# Inventory Service stopped. Nothing is listening on port 8001 any more:
+$ curl -sS http://127.0.0.1:8001/health; echo "curl exit code: $?"
+curl: (7) Failed to connect to 127.0.0.1 port 8001 after 2040 ms: Could not connect to server
+curl exit code: 7
+
+
+# Submit another order while Inventory is down
+$ curl -s -i -w '\ntime_total=%{time_total}s\n' -X POST http://127.0.0.1:8000/orders -H "Content-Type: application/json" -d '{"customer_id": "c-101", "item_id": "laptop", "quantity": 1}'
+HTTP/1.1 503 SERVICE UNAVAILABLE
+Server: Werkzeug/3.1.9 Python/3.13.15
+Date: Mon, 19 Oct 2026 21:20:11 GMT
+Content-Type: application/json
+Content-Length: 187
+Retry-After: 10
+Connection: close
+
+{
+  "error": "INVENTORY_SERVICE_UNAVAILABLE",
+  "message": "Order not created: the Inventory Service is unavailable, so item availability could not be checked. Please try again later."
+}
+
+time_total=2.038546s
+
+
+# Order Service is still running: same pid, status up, inventory_failures counted
+$ curl -s http://127.0.0.1:8000/health
+{
+  "service": "order-service",
+  "status": "up",
+  "pid": 26788,
+  "uptime_seconds": 12.0,
+  "orders_created": 1,
+  "orders_rejected": 3,
+  "inventory_failures": 1
+}
+
+
+# and it still serves its own data (the order created before the failure)
+$ curl -s http://127.0.0.1:8000/orders
+{
+  "orders": [
+    {
+      "order_id": "ORD-0001",
+      "customer_id": "c-101",
+      "item_id": "laptop",
+      "quantity": 2,
+      "status": "CREATED",
+      "created_at": "2026-10-19T21:20:01+00:00"
+    }
+  ]
+}
+
+

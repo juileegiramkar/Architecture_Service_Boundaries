@@ -1,0 +1,4 @@
+14:20:12 INFO    inventory-service | Inventory Service on http://127.0.0.1:8001 (pid 3860) stock={'laptop': 10, 'monitor': 3, 'mouse': 25, 'keyboard': 0}
+ * Serving Flask app 'app'
+ * Debug mode: off
+14:20:13 INFO    inventory-service | availability check item_id=laptop quantity=1 in_stock=10 -> available

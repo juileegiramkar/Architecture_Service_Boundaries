@@ -1,0 +1,68 @@
+# keyboard has 0 units in stock -> Inventory says unavailable -> 409
+$ curl -s -i -X POST http://127.0.0.1:8000/orders -H "Content-Type: application/json" -d '{"customer_id": "c-101", "item_id": "keyboard", "quantity": 1}'
+HTTP/1.1 409 CONFLICT
+Server: Werkzeug/3.1.9 Python/3.13.15
+Date: Mon, 19 Oct 2026 21:20:03 GMT
+Content-Type: application/json
+Content-Length: 189
+Connection: close
+
+{
+  "error": "ITEM_UNAVAILABLE",
+  "message": "Order not created: only 0 unit(s) of 'keyboard' in stock, 1 requested",
+  "inventory": {
+    "status": "unavailable",
+    "in_stock": 0
+  }
+}
+
+
+# monitor has 3 units, 5 requested -> unavailable -> 409
+$ curl -s -i -X POST http://127.0.0.1:8000/orders -H "Content-Type: application/json" -d '{"customer_id": "c-101", "item_id": "monitor", "quantity": 5}'
+HTTP/1.1 409 CONFLICT
+Server: Werkzeug/3.1.9 Python/3.13.15
+Date: Mon, 19 Oct 2026 21:20:04 GMT
+Content-Type: application/json
+Content-Length: 188
+Connection: close
+
+{
+  "error": "ITEM_UNAVAILABLE",
+  "message": "Order not created: only 3 unit(s) of 'monitor' in stock, 5 requested",
+  "inventory": {
+    "status": "unavailable",
+    "in_stock": 3
+  }
+}
+
+
+# item that does not exist -> 404
+$ curl -s -i -X POST http://127.0.0.1:8000/orders -H "Content-Type: application/json" -d '{"customer_id": "c-101", "item_id": "tablet", "quantity": 1}'
+HTTP/1.1 404 NOT FOUND
+Server: Werkzeug/3.1.9 Python/3.13.15
+Date: Mon, 19 Oct 2026 21:20:04 GMT
+Content-Type: application/json
+Content-Length: 96
+Connection: close
+
+{
+  "error": "ITEM_NOT_FOUND",
+  "message": "Order not created: item 'tablet' does not exist"
+}
+
+
+# invalid quantity -> 400 (rejected before calling Inventory)
+$ curl -s -i -X POST http://127.0.0.1:8000/orders -H "Content-Type: application/json" -d '{"customer_id": "c-101", "item_id": "laptop", "quantity": 0}'
+HTTP/1.1 400 BAD REQUEST
+Server: Werkzeug/3.1.9 Python/3.13.15
+Date: Mon, 19 Oct 2026 21:20:04 GMT
+Content-Type: application/json
+Content-Length: 82
+Connection: close
+
+{
+  "error": "INVALID_REQUEST",
+  "message": "quantity must be an integer >= 1"
+}
+
+

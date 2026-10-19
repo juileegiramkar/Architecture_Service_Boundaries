@@ -1,0 +1,17 @@
+14:20:00 INFO    order-service | Order Service on http://127.0.0.1:8000 (pid 26788) inventory=http://127.0.0.1:8001 notification=http://127.0.0.1:8002 timeout=2.0s
+ * Serving Flask app 'app'
+ * Debug mode: off
+14:20:01 INFO    order-service | POST /orders customer_id=c-101 item_id=laptop quantity=2
+14:20:01 INFO    order-service | Inventory: laptop available (in_stock=10) -> 201, created ORD-0001
+14:20:01 INFO    order-service | published OrderCreated event for ORD-0001
+14:20:03 INFO    order-service | POST /orders customer_id=c-101 item_id=keyboard quantity=1
+14:20:03 INFO    order-service | Inventory: keyboard unavailable (in_stock=0, requested=1) -> 409, order not created
+14:20:04 INFO    order-service | POST /orders customer_id=c-101 item_id=monitor quantity=5
+14:20:04 INFO    order-service | Inventory: monitor unavailable (in_stock=3, requested=5) -> 409, order not created
+14:20:04 INFO    order-service | POST /orders customer_id=c-101 item_id=tablet quantity=1
+14:20:04 INFO    order-service | Inventory: item tablet not found -> 404
+14:20:09 INFO    order-service | POST /orders customer_id=c-101 item_id=laptop quantity=1
+14:20:11 WARNING order-service | Inventory Service unreachable at http://127.0.0.1:8001 (ConnectTimeout) -> 503, order not created
+14:20:13 INFO    order-service | POST /orders customer_id=c-101 item_id=laptop quantity=1
+14:20:13 INFO    order-service | Inventory: laptop available (in_stock=10) -> 201, created ORD-0002
+14:20:13 INFO    order-service | published OrderCreated event for ORD-0002

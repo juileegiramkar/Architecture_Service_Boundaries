@@ -1,0 +1,31 @@
+# Each service is its own OS process with its own pid and port
+$ curl -s http://127.0.0.1:8001/health
+{
+  "service": "inventory-service",
+  "status": "up",
+  "pid": 28128,
+  "uptime_seconds": 0.6
+}
+
+
+$ curl -s http://127.0.0.1:8000/health
+{
+  "service": "order-service",
+  "status": "up",
+  "pid": 26788,
+  "uptime_seconds": 0.7,
+  "orders_created": 0,
+  "orders_rejected": 0,
+  "inventory_failures": 0
+}
+
+
+$ curl -s http://127.0.0.1:8002/health
+{
+  "service": "notification-service",
+  "status": "up",
+  "pid": 7496,
+  "uptime_seconds": 1.0
+}
+
+
